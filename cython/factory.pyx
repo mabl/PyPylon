@@ -49,6 +49,96 @@ cdef class DeviceInfo:
     def __repr__(self):
         return '<DeviceInfo {1}>'.format(self.serial_number, self.friendly_name)
 
+cdef class _PropertyMap:
+    cdef:
+        INodeMap* map
+
+    @staticmethod
+    cdef create(INodeMap* map):
+        obj = _PropertyMap()
+        obj.map = map
+        return obj
+
+    def __getitem__(self, str key):
+        cdef bytes btes_name = key.encode()
+        cdef INode* node = self.map.GetNode(gcstring(btes_name))
+
+        if node == NULL:
+            raise KeyError('Key does not exist')
+
+        # We need to try different types and check if the dynamic_cast succeeds... UGLY!
+        cdef IBoolean* boolean_value = dynamic_cast_iboolean_ptr(node)
+        if boolean_value != NULL:
+            return boolean_value.GetValue()
+
+        cdef IInteger* integer_value = dynamic_cast_iinteger_ptr(node)
+        if integer_value != NULL:
+            return integer_value.GetValue()
+
+        cdef IFloat* float_value = dynamic_cast_ifloat_ptr(node)
+        if float_value != NULL:
+            return float_value.GetValue()
+
+        # TODO: Probably we also need some type of enum to be useful
+
+        # Potentially, we can always get the setting by string
+        cdef IValue* string_value = dynamic_cast_ivalue_ptr(node)
+        if string_value == NULL:
+            return
+
+        return (<string>(string_value.ToString())).decode('ascii')
+
+    def __setitem__(self, str key, value):
+        cdef bytes btes_name = key.encode()
+        cdef INode* node = self.map.GetNode(gcstring(btes_name))
+
+        if node == NULL:
+            raise KeyError('Key does not exist')
+
+        # We need to try different types and check if the dynamic_cast succeeds... UGLY!
+        cdef IBoolean* boolean_value = dynamic_cast_iboolean_ptr(node)
+        if boolean_value != NULL:
+            boolean_value.SetValue(value)
+            return
+
+        cdef IInteger* integer_value = dynamic_cast_iinteger_ptr(node)
+        if integer_value != NULL:
+            integer_value.SetValue(value)
+            return
+
+        cdef IFloat* float_value = dynamic_cast_ifloat_ptr(node)
+        if float_value != NULL:
+            float_value.SetValue(value)
+            return
+
+        # TODO: Probably we also need some type of enum to be useful
+
+        # Potentially, we can always set the setting by string
+        cdef IValue* string_value = dynamic_cast_ivalue_ptr(node)
+        if string_value == NULL:
+            raise RuntimeError('Can not set key %s by string' % key)
+
+        cdef bytes bytes_value = str(value).encode()
+        string_value.FromString(gcstring(bytes_value))
+
+    property keys:
+        def __get__(self):
+            node_keys = list()
+
+            # Iterate through the discovered devices
+            cdef NodeList_t nodes
+            self.map.GetNodes(nodes)
+
+            cdef NodeList_t.iterator it = nodes.begin()
+            while it != nodes.end():
+                if not deref(it).IsFeature():
+                    name = (<string>(deref(it).GetName())).decode('ascii')
+                    node_keys.append(name)
+                inc(it)
+
+            return node_keys
+
+
 cdef class Camera:
     cdef:
         CInstantCamera camera
@@ -108,6 +198,10 @@ cdef class Camera:
 
     def grap_image(self, unsigned int timeout=5000):
         return next(self.grap_images(1, timeout))
+
+    property properties:
+        def __get__(self):
+            return _PropertyMap.create(&self.camera.GetNodeMap())
 
 
 cdef class Factory:

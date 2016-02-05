@@ -1,5 +1,63 @@
 from libcpp cimport bool
-from libc.stdint cimport uint32_t
+from libc.stdint cimport uint32_t, uint64_t, int64_t
+from libcpp.string cimport string
+
+cdef extern from "Base/GCBase.h":
+    cdef cppclass gcstring:
+        gcstring(char*)
+
+cdef extern from "GenApi/GenApi.h" namespace 'GenApi':
+
+    cdef cppclass INode:
+        gcstring GetName(bool FullQualified=False)
+        gcstring GetNameSpace()
+        bool IsFeature()
+        gcstring GetValue()
+
+    # Types an INode could be
+    cdef cppclass IValue:
+        gcstring ToString()
+        void FromString(gcstring, bool verify=True)
+
+    cdef cppclass IBoolean:
+        bool GetValue()
+        void SetValue(bool)
+
+    cdef cppclass IInteger:
+        int64_t GetValue()
+        void SetValue(int64_t)
+        int64_t GetMin()
+        int64_t GetMax()
+
+    cdef cppclass IString
+    cdef cppclass IFloat:
+        double GetValue()
+        void SetValue(double)
+        double GetMin()
+        double GetMax()
+
+    cdef cppclass NodeList_t:
+        cppclass iterator:
+            INode* operator*()
+            iterator operator++()
+            bint operator==(iterator)
+            bint operator!=(iterator)
+        NodeList_t()
+        CDeviceInfo& operator[](int)
+        CDeviceInfo& at(int)
+        iterator begin()
+        iterator end()
+
+    cdef cppclass INodeMap:
+        void GetNodes(NodeList_t&)
+        INode* GetNode(gcstring& )
+        uint32_t GetNumNodes()
+
+cdef extern from *:
+    IValue* dynamic_cast_ivalue_ptr "dynamic_cast<GenApi::IValue*>" (INode*) except +
+    IBoolean* dynamic_cast_iboolean_ptr "dynamic_cast<GenApi::IBoolean*>" (INode*) except +
+    IInteger* dynamic_cast_iinteger_ptr "dynamic_cast<GenApi::IInteger*>" (INode*) except +
+    IFloat* dynamic_cast_ifloat_ptr "dynamic_cast<GenApi::IFloat*>" (INode*) except +
 
 cdef extern from "pylon/PylonIncludes.h" namespace 'Pylon':
     # Common special data types
@@ -48,6 +106,7 @@ cdef extern from "pylon/PylonIncludes.h" namespace 'Pylon':
         void StartGrabbing(size_t maxImages)    #FIXME: implement different strategies
         bool IsGrabbing()
         bool RetrieveResult(unsigned int timeout_ms, CGrabResultPtr& grab_result)  # FIXME: Timout handling
+        INodeMap& GetNodeMap()
 
     cdef cppclass DeviceInfoList_t:
         cppclass iterator:
