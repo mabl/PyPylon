@@ -15,6 +15,6 @@ cam = pypylon.factory.create_device(available_cameras[0])
 
 # Open camera and grep some images
 cam.open()
-for image in cam.grap_images(1):
+for image in cam.grap_images(5):
     plt.imshow(image)
     plt.show()

@@ -8,6 +8,7 @@ cdef extern from "pylon/PylonIncludes.h" namespace 'Pylon':
 
     # Top level init functions
     void PylonInitialize()
+    void PylonTerminate()
 
     # cdef enum EPixelType:
 

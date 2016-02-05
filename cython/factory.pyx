@@ -115,7 +115,7 @@ cdef class Factory:
         PylonInitialize()
 
     def __dealloc__(self):
-        pass
+        PylonTerminate()
 
     def find_devices(self):
         cdef CTlFactory* tl_factory = &GetInstance()
