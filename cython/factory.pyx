@@ -59,6 +59,26 @@ cdef class _PropertyMap:
         obj.map = map
         return obj
 
+    def get_description(self, str key):
+        cdef bytes btes_name = key.encode()
+        cdef INode* node = self.map.GetNode(gcstring(btes_name))
+
+        if node == NULL:
+            raise KeyError('Key does not exist')
+
+        return (<string>(node.GetDescription())).decode()
+
+
+    def get_display_name(self, str key):
+        cdef bytes btes_name = key.encode()
+        cdef INode* node = self.map.GetNode(gcstring(btes_name))
+
+        if node == NULL:
+            raise KeyError('Key does not exist')
+
+        return (<string>(node.GetDisplayName())).decode()
+
+
     def __getitem__(self, str key):
         cdef bytes btes_name = key.encode()
         cdef INode* node = self.map.GetNode(gcstring(btes_name))
@@ -66,7 +86,11 @@ cdef class _PropertyMap:
         if node == NULL:
             raise KeyError('Key does not exist')
 
+        if not node_is_readable(node):
+            raise PermissionError('Key is not readable')
+
         # We need to try different types and check if the dynamic_cast succeeds... UGLY!
+        # Potentially we could also use GetPrincipalInterfaceType here.
         cdef IBoolean* boolean_value = dynamic_cast_iboolean_ptr(node)
         if boolean_value != NULL:
             return boolean_value.GetValue()
@@ -86,7 +110,7 @@ cdef class _PropertyMap:
         if string_value == NULL:
             return
 
-        return (<string>(string_value.ToString())).decode('ascii')
+        return (<string>(string_value.ToString())).decode()
 
     def __setitem__(self, str key, value):
         cdef bytes btes_name = key.encode()
@@ -95,7 +119,11 @@ cdef class _PropertyMap:
         if node == NULL:
             raise KeyError('Key does not exist')
 
+        if not node_is_writable(node):
+            raise PermissionError('Key is not writable')
+
         # We need to try different types and check if the dynamic_cast succeeds... UGLY!
+        # Potentially we could also use GetPrincipalInterfaceType here.
         cdef IBoolean* boolean_value = dynamic_cast_iboolean_ptr(node)
         if boolean_value != NULL:
             boolean_value.SetValue(value)
@@ -121,22 +149,21 @@ cdef class _PropertyMap:
         cdef bytes bytes_value = str(value).encode()
         string_value.FromString(gcstring(bytes_value))
 
-    property keys:
-        def __get__(self):
-            node_keys = list()
+    def keys(self):
+        node_keys = list()
 
-            # Iterate through the discovered devices
-            cdef NodeList_t nodes
-            self.map.GetNodes(nodes)
+        # Iterate through the discovered devices
+        cdef NodeList_t nodes
+        self.map.GetNodes(nodes)
 
-            cdef NodeList_t.iterator it = nodes.begin()
-            while it != nodes.end():
-                if not deref(it).IsFeature():
-                    name = (<string>(deref(it).GetName())).decode('ascii')
-                    node_keys.append(name)
-                inc(it)
+        cdef NodeList_t.iterator it = nodes.begin()
+        while it != nodes.end():
+            if deref(it).IsFeature() and dynamic_cast_icategory_ptr(deref(it)) == NULL:
+                name = (<string>(deref(it).GetName())).decode('ascii')
+                node_keys.append(name)
+            inc(it)
 
-            return node_keys
+        return node_keys
 
 
 cdef class Camera:

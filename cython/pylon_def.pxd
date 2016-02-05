@@ -11,6 +11,8 @@ cdef extern from "GenApi/GenApi.h" namespace 'GenApi':
     cdef cppclass INode:
         gcstring GetName(bool FullQualified=False)
         gcstring GetNameSpace()
+        gcstring GetDescription()
+        gcstring GetDisplayName()
         bool IsFeature()
         gcstring GetValue()
 
@@ -48,6 +50,8 @@ cdef extern from "GenApi/GenApi.h" namespace 'GenApi':
         iterator begin()
         iterator end()
 
+    cdef cppclass ICategory
+
     cdef cppclass INodeMap:
         void GetNodes(NodeList_t&)
         INode* GetNode(gcstring& )
@@ -58,6 +62,13 @@ cdef extern from *:
     IBoolean* dynamic_cast_iboolean_ptr "dynamic_cast<GenApi::IBoolean*>" (INode*) except +
     IInteger* dynamic_cast_iinteger_ptr "dynamic_cast<GenApi::IInteger*>" (INode*) except +
     IFloat* dynamic_cast_ifloat_ptr "dynamic_cast<GenApi::IFloat*>" (INode*) except +
+    INodeMap* dynamic_cast_inodemap_ptr "dynamic_cast<GenApi::INodeMap*>" (INode*) except +
+    INodeMap* dynamic_cast_inodemap_ptr "dynamic_cast<GenApi::INodeMap*>" (INode*) except +
+    ICategory* dynamic_cast_icategory_ptr "dynamic_cast<GenApi::ICategory*>" (INode*) except +
+
+    bool node_is_readable "GenApi::IsReadable" (INode*) except +
+    bool node_is_writable "GenApi::IsWritable" (INode*) except +
+    bool node_is_implemented "GenApi::IsImplemented" (INode*) except +
 
 cdef extern from "pylon/PylonIncludes.h" namespace 'Pylon':
     # Common special data types
