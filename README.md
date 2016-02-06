@@ -8,12 +8,13 @@ While the basic code seems to work, I'd like to point out, that it still in earl
 
 ## Current TODO list and development targets
  - [ ] Test with color cameras
- - [ ] Handle different image packing other than Mono8
+ - [x] Handle different image packing other than Mono8
  - [ ] Make cython code more modular
  - [ ] Support commands
  - [ ] Try triggered images and such
  - [ ] Add some callbacks on events
-
+ - [ ] Test code under Windows
+ 
 ## Simple usage example
 ```python
 >>> import pypylon
