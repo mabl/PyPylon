@@ -15,6 +15,7 @@ def detect_pylon(config_config='/opt/pylon5/bin/pylon-config'):
                                        subprocess.check_output([config_config,
                                                                 '--libs-only-l']).decode().strip().split('-l') if _]
     compiler_config['language'] = 'c++'
+    compiler_config['runtime_library_dirs'] = compiler_config['library_dirs']
     return compiler_config
 
 
