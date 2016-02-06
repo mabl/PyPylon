@@ -1,9 +1,7 @@
-from distutils.core import setup
-from Cython.Distutils import build_ext
-from distutils.extension import Extension
-
-
+from setuptools import setup, find_packages
+from Cython.Distutils import build_ext, Extension
 import subprocess
+
 
 def detect_pylon(config_config='/opt/pylon5/bin/pylon-config'):
     compiler_config = dict()
@@ -33,16 +31,22 @@ setup(name='pypylon',
       author_email="matthias@blaicher.com",
       cmdclass={'build_ext': build_ext},
       ext_modules=pypylon_extensions,
-      # ext_modules=cythonize('pypylon/*.pyx', language='c++', **detect_pylon()),
-      # install_requires=['cython>=0.20.1'],
+      packages=find_packages(exclude=['contrib', 'docs', 'tests', 'examples', 'cython']),
 
+      # for the classifiers review see:
+      # https://pypi.python.org/pypi?%3Aaction=list_classifiers
+      classifiers=[
+          'Development Status :: 3 - Alpha',
+
+          'Intended Audience :: Developers',
+          'Topic :: Multimedia :: Graphics :: Capture :: Digital Camera'
+
+          'License :: OSI Approved :: BSD License',
+
+          'Programming Language :: Python :: 3',
+          'Programming Language :: Python :: 3.2',
+          'Programming Language :: Python :: 3.3',
+          'Programming Language :: Python :: 3.4',
+          'Programming Language :: Python :: 3.5',
+      ],
       )
-
-# for the classifiers review see:
-# https://pypi.python.org/pypi?%3Aaction=list_classifiers
-#
-# Development Status :: 1 - Planning
-# Development Status :: 2 - Pre-Alpha
-# Development Status :: 3 - Alpha
-# Development Status :: 4 - Beta
-# Development Status :: 5 - Production/Stable
