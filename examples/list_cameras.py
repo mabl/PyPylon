@@ -9,7 +9,7 @@ available_cameras = pypylon.factory.find_devices()
 print('Available cameras are', available_cameras)
 
 # Grep the first one and create a camera for it
-cam = pypylon.factory.create_device(available_cameras[0])
+cam = pypylon.factory.create_device(available_cameras[-1])
 
 # We can still get information of the camera back
 print('Camera info of camera object:', cam.device_info)
@@ -18,10 +18,12 @@ print('Camera info of camera object:', cam.device_info)
 cam.open()
 
 # Hard code exposure time
-cam.properties['ExposureTime'] = 10000.0
+# cam.properties['ExposureTime'] = 10000.0
+cam.properties['PixelFormat'] = 'Mono12'
+print(cam.properties['PixelSize'])
 
 # Go to full available speed
-cam.properties['DeviceLinkThroughputLimitMode'] = 'Off'
+# cam.properties['DeviceLinkThroughputLimitMode'] = 'Off'
 
 for key in cam.properties.keys():
     try:
@@ -38,10 +40,11 @@ for key in cam.properties.keys():
 # for image in tqdm.tqdm(cam.grap_images(200), leave=True):
 #     pass
 
-plt.figure()
-plt.imshow(np.mean([img for img in cam.grap_images(100)], axis=0, dtype=np.float))
+# plt.figure()
+# plt.imshow(np.mean([img for img in cam.grap_images(100)], axis=0, dtype=np.float))
 
 plt.figure()
 for image in cam.grap_images(1):
+    print(image.shape)
     plt.imshow(image)
     plt.show()

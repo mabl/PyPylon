@@ -212,15 +212,21 @@ cdef class Camera:
         cdef CGrabResultPtr ptr_grab_result
         cdef IImage* img
 
+        cdef str image_format = self.properties['PixelFormat']
+        cdef str bits_per_pixel_prop = self.properties['PixelSize']
+        assert bits_per_pixel_prop.startswith('Bpp'), 'PixelSize property should start with "Bpp"'
+        assert image_format.startswith('Mono'), 'Only mono images allowed at this point'
+        assert not image_format.endswith('p'), 'Packed data not supported at this point'
+
         while self.camera.IsGrabbing():
             self.camera.RetrieveResult(timeout, ptr_grab_result)
             # yield deref(ptr_grab_result).GrabSucceeded()
             img = &(<IImage&>ptr_grab_result)
-            img_data = np.frombuffer((<char*>img.GetBuffer())[:img.GetImageSize()], dtype=np.uint8)
+            img_data = np.frombuffer((<char*>img.GetBuffer())[:img.GetImageSize()], dtype='uint'+bits_per_pixel_prop[3:])
 
             # TODO: How to handle multi-byte data here?
             img_data = img_data.reshape((img.GetHeight(), -1))
-            img_data = img_data[:img.GetHeight(), :img.GetWidth()]
+            # img_data = img_data[:img.GetHeight(), :img.GetWidth()]
             yield img_data
 
     def grap_image(self, unsigned int timeout=5000):
