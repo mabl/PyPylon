@@ -87,7 +87,7 @@ cdef class _PropertyMap:
             raise KeyError('Key does not exist')
 
         if not node_is_readable(node):
-            raise PermissionError('Key is not readable')
+            raise IOError('Key is not readable')
 
         # We need to try different types and check if the dynamic_cast succeeds... UGLY!
         # Potentially we could also use GetPrincipalInterfaceType here.
@@ -120,7 +120,7 @@ cdef class _PropertyMap:
             raise KeyError('Key does not exist')
 
         if not node_is_writable(node):
-            raise PermissionError('Key is not writable')
+            raise IOError('Key is not writable')
 
         # We need to try different types and check if the dynamic_cast succeeds... UGLY!
         # Potentially we could also use GetPrincipalInterfaceType here.
