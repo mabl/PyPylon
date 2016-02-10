@@ -1,3 +1,5 @@
+from __future__ import absolute_import, print_function, division
+
 import pypylon
 import matplotlib.pyplot as plt
 import tqdm
@@ -28,7 +30,7 @@ print(cam.properties['PixelSize'])
 for key in cam.properties.keys():
     try:
         value = cam.properties[key]
-    except PermissionError:
+    except IOError:
         value = '<NOT READABLE>'
 
     print('{0} ({1}):\t{2}'.format(key, cam.properties.get_description(key), value))
