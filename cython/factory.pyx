@@ -222,6 +222,17 @@ cdef class Camera:
             self.camera.RetrieveResult(timeout, ptr_grab_result)
             # yield deref(ptr_grab_result).GrabSucceeded()
             img = &(<IImage&>ptr_grab_result)
+
+            if img.GetImageSize() % img.GetHeight():
+                print('This image buffer is wired. Probably you will see an error soonish.')
+                print('\tBytes:', img.GetImageSize())
+                print('\tHeight:', img.GetHeight())
+                print('\tWidth:', img.GetWidth())
+                print('\tGetPaddingX:', img.GetPaddingX())
+
+            assert not img.GetPaddingX(), 'Image padding not supported.'
+            # TODO: Check GetOrientation to fix oritentation of image if required.
+
             img_data = np.frombuffer((<char*>img.GetBuffer())[:img.GetImageSize()], dtype='uint'+bits_per_pixel_prop[3:])
 
             # TODO: How to handle multi-byte data here?
