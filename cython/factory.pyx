@@ -59,7 +59,7 @@ cdef class _PropertyMap:
         obj.map = map
         return obj
 
-    def get_description(self, str key):
+    def get_description(self, basestring key):
         cdef bytes btes_name = key.encode()
         cdef INode* node = self.map.GetNode(gcstring(btes_name))
 
@@ -69,7 +69,7 @@ cdef class _PropertyMap:
         return (<string>(node.GetDescription())).decode()
 
 
-    def get_display_name(self, str key):
+    def get_display_name(self, basestring key):
         cdef bytes btes_name = key.encode()
         cdef INode* node = self.map.GetNode(gcstring(btes_name))
 
@@ -79,7 +79,7 @@ cdef class _PropertyMap:
         return (<string>(node.GetDisplayName())).decode()
 
 
-    def __getitem__(self, str key):
+    def __getitem__(self, basestring key):
         cdef bytes btes_name = key.encode()
         cdef INode* node = self.map.GetNode(gcstring(btes_name))
 
