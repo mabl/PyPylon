@@ -212,8 +212,8 @@ cdef class Camera:
         cdef CGrabResultPtr ptr_grab_result
         cdef IImage* img
 
-        cdef str image_format = self.properties['PixelFormat']
-        cdef str bits_per_pixel_prop = self.properties['PixelSize']
+        cdef str image_format = str(self.properties['PixelFormat'])
+        cdef str bits_per_pixel_prop = str(self.properties['PixelSize'])
         assert bits_per_pixel_prop.startswith('Bpp'), 'PixelSize property should start with "Bpp"'
         assert image_format.startswith('Mono'), 'Only mono images allowed at this point'
         assert not image_format.endswith('p'), 'Packed data not supported at this point'
