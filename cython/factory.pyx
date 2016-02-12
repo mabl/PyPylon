@@ -220,10 +220,14 @@ cdef class Camera:
 
         while self.camera.IsGrabbing():
             self.camera.RetrieveResult(timeout, ptr_grab_result)
-            # yield deref(ptr_grab_result).GrabSucceeded()
+
+            if not ACCESS_CGrabResultPtr_GrabSucceeded(ptr_grab_result):
+                error_desc = (<string>(ACCESS_CGrabResultPtr_GetErrorDescription(ptr_grab_result))).decode()
+                raise RuntimeError(error_desc)
+
             img = &(<IImage&>ptr_grab_result)
             if not img.IsValid():
-                raise RuntimeError('Graped image is not valid.')
+                raise RuntimeError('Graped IImage is not valid.')
 
             if img.GetImageSize() % img.GetHeight():
                 print('This image buffer is wired. Probably you will see an error soonish.')

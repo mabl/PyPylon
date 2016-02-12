@@ -89,10 +89,13 @@ cdef extern from "pylon/PylonIncludes.h" namespace 'Pylon':
         void* GetBuffer()
         bool IsValid()
 
+    cdef cppclass CGrabResultData:
+        bool GrabSucceeded()
+
     cdef cppclass CGrabResultPtr:
         IImage& operator()
         #CGrabResultData* operator->()
-        pass
+
 
     cdef cppclass IPylonDevice:
         pass
@@ -138,4 +141,10 @@ cdef extern from "pylon/PylonIncludes.h" namespace 'Pylon':
 
 # Hack to define a static member function
 cdef extern from "pylon/PylonIncludes.h"  namespace 'Pylon::CTlFactory':
-        CTlFactory& GetInstance()
+    CTlFactory& GetInstance()
+
+# EVIL HACK: We cannot dereference officially with the -> operator. So we use ugly macros...
+cdef extern from 'hacks.h':
+    bool ACCESS_CGrabResultPtr_GrabSucceeded(CGrabResultPtr ptr)
+    String_t ACCESS_CGrabResultPtr_GetErrorDescription(CGrabResultPtr ptr)
+    uint32_t ACCESS_CGrabResultPtr_GetErrorCode(CGrabResultPtr ptr)
