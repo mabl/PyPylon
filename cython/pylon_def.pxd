@@ -87,6 +87,7 @@ cdef extern from "pylon/PylonIncludes.h" namespace 'Pylon':
         size_t GetPaddingX()
         size_t GetImageSize()
         void* GetBuffer()
+        bool IsValid()
 
     cdef cppclass CGrabResultPtr:
         IImage& operator()
