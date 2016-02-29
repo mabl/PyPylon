@@ -36,7 +36,7 @@ False
 >>> 
 
 >>> import matplotlib.pyplot as plt
->>> for image in cam.grap_images(1):
+>>> for image in cam.grab_images(1):
 ...     plt.imshow(image)
 ...     plt.show()
 ```

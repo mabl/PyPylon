@@ -46,7 +46,7 @@ for key in cam.properties.keys():
 # plt.imshow(np.mean([img for img in cam.grap_images(100)], axis=0, dtype=np.float))
 
 plt.figure()
-for image in cam.grap_images(1):
+for image in cam.grab_images(1):
     print(image.shape)
     plt.imshow(image)
     plt.show()

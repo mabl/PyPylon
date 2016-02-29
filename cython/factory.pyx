@@ -203,7 +203,7 @@ cdef class Camera:
     def __repr__(self):
         return '<Camera {0} open={1}>'.format(self.device_info.friendly_name, self.opened)
 
-    def grap_images(self, int nr_images, unsigned int timeout=5000):
+    def grab_images(self, int nr_images, unsigned int timeout=5000):
         if not self.opened:
             raise RuntimeError('Camera not opened')
 
@@ -246,8 +246,8 @@ cdef class Camera:
             # img_data = img_data[:img.GetHeight(), :img.GetWidth()]
             yield img_data
 
-    def grap_image(self, unsigned int timeout=5000):
-        return next(self.grap_images(1, timeout))
+    def grab_image(self, unsigned int timeout=5000):
+        return next(self.grab_images(1, timeout))
 
     property properties:
         def __get__(self):
