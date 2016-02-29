@@ -13,7 +13,7 @@ While the basic code seems to work, I'd like to point out, that it still in earl
  - [ ] Support commands
  - [ ] Try triggered images and such
  - [ ] Add some callbacks on events
- - [ ] Test code under Windows
+ - [x] Test code under Windows
  
 ## Simple usage example
 ```python
