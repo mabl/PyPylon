@@ -19,22 +19,22 @@ cdef extern from "GenApi/GenApi.h" namespace 'GenApi':
     # Types an INode could be
     cdef cppclass IValue:
         gcstring ToString()
-        void FromString(gcstring, bool verify=True)
+        void FromString(gcstring, bool verify=True) except +
 
     cdef cppclass IBoolean:
         bool GetValue()
-        void SetValue(bool)
+        void SetValue(bool) except +
 
     cdef cppclass IInteger:
         int64_t GetValue()
-        void SetValue(int64_t)
+        void SetValue(int64_t) except +
         int64_t GetMin()
         int64_t GetMax()
 
     cdef cppclass IString
     cdef cppclass IFloat:
         double GetValue()
-        void SetValue(double)
+        void SetValue(double) except +
         double GetMin()
         double GetMax()
 
@@ -76,8 +76,8 @@ cdef extern from "pylon/PylonIncludes.h" namespace 'Pylon':
     cdef cppclass StringList_t
 
     # Top level init functions
-    void PylonInitialize()
-    void PylonTerminate()
+    void PylonInitialize() except +
+    void PylonTerminate() except +
 
     # cdef enum EPixelType:
 
@@ -101,26 +101,26 @@ cdef extern from "pylon/PylonIncludes.h" namespace 'Pylon':
         pass
 
     cdef cppclass CDeviceInfo:
-        String_t GetSerialNumber()
-        String_t GetUserDefinedName()
-        String_t GetModelName()
-        String_t GetDeviceVersion()
-        String_t GetFriendlyName()
-        String_t GetVendorName()
-        String_t GetDeviceClass()
+        String_t GetSerialNumber() except +
+        String_t GetUserDefinedName() except +
+        String_t GetModelName() except +
+        String_t GetDeviceVersion() except +
+        String_t GetFriendlyName() except +
+        String_t GetVendorName() except +
+        String_t GetDeviceClass() except +
 
     cdef cppclass CInstantCamera:
         CInstantCamera()
         void Attach(IPylonDevice*)
-        CDeviceInfo& GetDeviceInfo()
+        CDeviceInfo& GetDeviceInfo() except +
         void IsCameraDeviceRemoved()
-        void Open()
-        void Close()
-        bool IsOpen()
-        IPylonDevice* DetachDevice()
-        void StartGrabbing(size_t maxImages)    #FIXME: implement different strategies
+        void Open() except +
+        void Close() except +
+        bool IsOpen() except +
+        IPylonDevice* DetachDevice() except +
+        void StartGrabbing(size_t maxImages) except +    #FIXME: implement different strategies
         bool IsGrabbing()
-        bool RetrieveResult(unsigned int timeout_ms, CGrabResultPtr& grab_result)  # FIXME: Timout handling
+        bool RetrieveResult(unsigned int timeout_ms, CGrabResultPtr& grab_result) except +  # FIXME: Timout handling
         INodeMap& GetNodeMap()
 
     cdef cppclass DeviceInfoList_t:
