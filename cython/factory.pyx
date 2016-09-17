@@ -261,7 +261,7 @@ cdef class Camera:
 
 
 cdef class Factory:
-    def __init__(self):
+    def __cinit__(self):
         PylonInitialize()
 
     def __dealloc__(self):
