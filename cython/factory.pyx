@@ -131,11 +131,17 @@ cdef class _PropertyMap:
 
         cdef IInteger* integer_value = dynamic_cast_iinteger_ptr(node)
         if integer_value != NULL:
+            if value < integer_value.GetMin() or value > integer_value.GetMax():
+                raise ValueError('Parameter value for {} not inside valid range [{}, {}], was {}'.format(
+                    key, integer_value.GetMin(), integer_value.GetMax(), value))
             integer_value.SetValue(value)
             return
 
         cdef IFloat* float_value = dynamic_cast_ifloat_ptr(node)
         if float_value != NULL:
+            if value < float_value.GetMin() or value > float_value.GetMax():
+                raise ValueError('Parameter value for {} not inside valid range [{}, {}], was {}'.format(
+                    key, float_value.GetMin(), float_value.GetMax(), value))
             float_value.SetValue(value)
             return
 
