@@ -113,8 +113,8 @@ cdef class _PropertyMap:
         return (<string>(string_value.ToString())).decode()
 
     def __setitem__(self, str key, value):
-        cdef bytes btes_name = key.encode()
-        cdef INode* node = self.map.GetNode(gcstring(btes_name))
+        cdef bytes bytes_name = key.encode()
+        cdef INode* node = self.map.GetNode(gcstring(bytes_name))
 
         if node == NULL:
             raise KeyError('Key does not exist')
