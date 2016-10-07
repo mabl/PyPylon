@@ -43,9 +43,42 @@ def fake_detect_pylon_windows(pylon_dir=r'C:\Program Files\Basler\pylon 5'):
     compiler_config['language'] = 'c++'
     return compiler_config
 
+def fake_detect_pylon_osx(pylon_dir='/Library/Frameworks/pylon.framework'):
+    if not os.path.isdir(pylon_dir):
+        raise RuntimeError('Pylon framework not found')
+
+    compiler_config = dict()
+    compiler_config['extra_compile_args'] = ['-v']
+
+    pylon_headers_dir = os.path.join(pylon_dir, 'Headers')
+    compiler_config['include_dirs'] = [pylon_headers_dir]
+    for potential_include_dir in [os.path.join(pylon_headers_dir, _) for _ in os.listdir(pylon_headers_dir)]:
+        if os.path.isdir(potential_include_dir):
+            compiler_config['include_dirs'].append(potential_include_dir)
+
+    compiler_config['library_dirs'] = [os.path.join(os.sep, 'usr', 'lib'),
+                                       os.path.join(os.sep, 'usr', 'local', 'lib'),
+                                       os.path.join(pylon_dir, '..'),
+                                       os.path.join(pylon_dir, 'Libraries')]
+
+    compiler_config['extra_link_args'] = ['-v',
+                                          '-rpath', os.path.join(os.sep, 'Library', 'Frameworks'),
+                                          '-framework', 'pylon']
+
+    dylibs = ['.'.join(_.split('.')[:-1]) for _ in os.listdir(os.path.join(pylon_dir, 'Libraries'))
+                                         if  _.endswith('.dylib')]
+    for dylib in dylibs:
+        compiler_config['extra_link_args'].append('-L')
+        compiler_config['extra_link_args'].append(dylib)
+
+    compiler_config['language'] = 'c++'
+    return compiler_config
+
 
 if sys.platform == 'win32':
     build_options = fake_detect_pylon_windows()
+elif sys.platform == 'darwin':
+    build_options = fake_detect_pylon_osx()
 else:
     build_options = detect_pylon()
 
