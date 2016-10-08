@@ -49,7 +49,7 @@ def fake_detect_pylon_osx(pylon_dir='/Library/Frameworks/pylon.framework'):
     compiler_config['include_dirs'] = [os.path.join(pylon_dir, 'Headers'),
                                        os.path.join(pylon_dir, 'Headers', 'GenICam')]
 
-    compiler_config['extra_link_args'] = ['-rpath', os.path.join(os.sep, 'Library', 'Frameworks'),
+    compiler_config['extra_link_args'] = ['-rpath', os.path.join(*os.path.split(pylon_dir)[:-1]),
                                           '-framework', 'pylon']
     return compiler_config
 
