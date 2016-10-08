@@ -65,12 +65,6 @@ def fake_detect_pylon_osx(pylon_dir='/Library/Frameworks/pylon.framework'):
                                           '-rpath', os.path.join(os.sep, 'Library', 'Frameworks'),
                                           '-framework', 'pylon']
 
-    dylibs = ['.'.join(_.split('.')[:-1]) for _ in os.listdir(os.path.join(pylon_dir, 'Libraries'))
-                                         if  _.endswith('.dylib')]
-    for dylib in dylibs:
-        compiler_config['extra_link_args'].append('-L')
-        compiler_config['extra_link_args'].append(dylib)
-
     compiler_config['language'] = 'c++'
     return compiler_config
 
