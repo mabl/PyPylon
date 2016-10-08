@@ -48,21 +48,10 @@ def fake_detect_pylon_osx(pylon_dir='/Library/Frameworks/pylon.framework'):
         raise RuntimeError('Pylon framework not found')
 
     compiler_config = dict()
-    compiler_config['extra_compile_args'] = ['-v']
+    compiler_config['include_dirs'] = [os.path.join(pylon_dir, 'Headers'),
+                                       os.path.join(pylon_dir, 'Headers', 'GenICam')]
 
-    pylon_headers_dir = os.path.join(pylon_dir, 'Headers')
-    compiler_config['include_dirs'] = [pylon_headers_dir]
-    for potential_include_dir in [os.path.join(pylon_headers_dir, _) for _ in os.listdir(pylon_headers_dir)]:
-        if os.path.isdir(potential_include_dir):
-            compiler_config['include_dirs'].append(potential_include_dir)
-
-    compiler_config['library_dirs'] = [os.path.join(os.sep, 'usr', 'lib'),
-                                       os.path.join(os.sep, 'usr', 'local', 'lib'),
-                                       os.path.join(pylon_dir, '..'),
-                                       os.path.join(pylon_dir, 'Libraries')]
-
-    compiler_config['extra_link_args'] = ['-v',
-                                          '-rpath', os.path.join(os.sep, 'Library', 'Frameworks'),
+    compiler_config['extra_link_args'] = ['-rpath', os.path.join(os.sep, 'Library', 'Frameworks'),
                                           '-framework', 'pylon']
 
     compiler_config['language'] = 'c++'
