@@ -16,7 +16,6 @@ def detect_pylon(config_config='/opt/pylon5/bin/pylon-config'):
     compiler_config['libraries'] = [_.strip() for _ in
                                        subprocess.check_output([config_config,
                                                                 '--libs-only-l']).decode().strip().split('-l') if _]
-    compiler_config['language'] = 'c++'
     compiler_config['runtime_library_dirs'] = compiler_config['library_dirs']
     return compiler_config
 
@@ -40,14 +39,30 @@ def fake_detect_pylon_windows(pylon_dir=r'C:\Program Files\Basler\pylon 5'):
                                        os.path.join(pylon_dir, 'Development', 'lib', arch)]
     compiler_config['libraries'] = list([_[:-4] for _ in os.listdir(os.path.join(pylon_dir, 'Development', 'lib', arch))
                                          if  _.endswith('.lib')])
-    compiler_config['language'] = 'c++'
+    return compiler_config
+
+def fake_detect_pylon_osx(pylon_dir='/Library/Frameworks/pylon.framework'):
+    if not os.path.isdir(pylon_dir):
+        raise RuntimeError('Pylon framework not found')
+
+    compiler_config = dict()
+    compiler_config['include_dirs'] = [os.path.join(pylon_dir, 'Headers'),
+                                       os.path.join(pylon_dir, 'Headers', 'GenICam')]
+
+    compiler_config['extra_link_args'] = ['-rpath', os.path.join(*os.path.split(pylon_dir)[:-1]),
+                                          '-framework', 'pylon']
     return compiler_config
 
 
 if sys.platform == 'win32':
     build_options = fake_detect_pylon_windows()
+elif sys.platform == 'darwin':
+    build_options = fake_detect_pylon_osx()
 else:
     build_options = detect_pylon()
+
+# Set build language
+build_options['language'] = 'c++'
 
 # Add numpy build options
 build_options['include_dirs'].append(numpy.get_include())
