@@ -225,7 +225,10 @@ cdef class Camera:
         assert not image_format.endswith('p'), 'Packed data not supported at this point'
 
         while self.camera.IsGrabbing():
-            self.camera.RetrieveResult(timeout, ptr_grab_result)
+
+            with nogil:
+                # Blocking call into native Pylon C++ SDK code, release GIL so other python threads can run
+                self.camera.RetrieveResult(timeout, ptr_grab_result)
 
             if not ACCESS_CGrabResultPtr_GrabSucceeded(ptr_grab_result):
                 error_desc = (<string>(ACCESS_CGrabResultPtr_GetErrorDescription(ptr_grab_result))).decode()
